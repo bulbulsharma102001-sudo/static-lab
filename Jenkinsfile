@@ -28,4 +28,15 @@ pipeline {
                 Get-Process python -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process $_ -Force }
 
                 # Move to workspace (where index.html is)
-                Set-Location $
+                Set-Location $env:WORKSPACE
+
+                # Start HTTP server in background
+                Start-Process powershell -ArgumentList '-NoExit','-Command','python -m http.server 8085 --bind 0.0.0.0' -WindowStyle Hidden
+
+                Start-Sleep -Seconds 3
+                Write-Host "Server started! Access it on http://localhost:8085"
+                '''
+            }
+        }
+    }
+}
