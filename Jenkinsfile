@@ -8,6 +8,12 @@ pipeline {
             }
         }
 
+        stage('Verify Python') {
+            steps {
+                powershell 'python --version'
+            }
+        }
+
         stage('Build') {
             steps {
                 echo 'Static website — build not required.'
@@ -17,14 +23,9 @@ pipeline {
         stage('Run Website') {
             steps {
                 echo 'Starting local web server on port 8085...'
-                
-                // Run Python HTTP server in background using PowerShell
-                powershell """
-                Start-Process powershell -ArgumentList '-NoExit', '-Command', 'python -m http.server 8085' -WindowStyle Hidden
-                """
-                
-                echo 'Server started! Access at http://localhost:8085'
-            }
-        }
-    }
-}
+                powershell '''
+                # Stop any running Python server first
+                Get-Process python -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process $_ -Force }
+
+                # Move to workspace (where index.html is)
+                Set-Location $
